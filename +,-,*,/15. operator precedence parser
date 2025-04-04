@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <string.h>
+char stack[100]; int top = 0;
+char precedence[5][5] = {
+ {'>', '>', '<', '<', '>'},
+ {'>', '>', '<', '<', '>'},
+ {'>', '>', '>', '>', '>'},
+ {'>', '>', '>', '>', '>'},
+ {'<', '<', '<', '<', '>'}
+};
+char operators[] = "+-*/$";
+int getIndex(char c) {
+ for (int i = 0; i < 5; i++) if (operators[i] == c) return i;
+ return -1;
+}
+void parse(char *input) {
+ stack[top] = '$';
+ int i = 0;
+ while (i < strlen(input)) {
+ char cur = input[i];
+ int si = getIndex(stack[top]), ci = getIndex(cur);
+ if (ci == -1) { printf("Invalid character\n"); return; }
+ if (precedence[si][ci] == '<' || precedence[si][ci] == '=')
+ stack[++top] = cur, i++;
+ else {
+ while (precedence[getIndex(stack[top-1])][ci] == '>') top--;
+ }
+ }
+ printf((top == 1 && stack[top] == '$') ? "Valid Expression\n" : "Invalid Expression\n");
+}
+int main() {
+ char input[100];
+ printf("Enter expression: "), scanf("%s", input);
+ parse(input);
+}
